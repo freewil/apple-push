@@ -11,14 +11,22 @@ module.exports = class ApplePush {
    * urls for the APNS server depending upon the value
    * of the NODE_ENV environment variable.
    *
+   * @param {String} env - 'sandbox' or 'production'
    * @return {ApplePush} A new instance of type ApplePush
    */
-  constructor () {
-    if (process.env.NODE_ENV === 'production') {
-      this.url = 'https://api.push.apple.com'
-    } else {
-      this.url = 'https://api.sandbox.push.apple.com'
-    }
+  constructor (env) {
+    this.url = (() => {
+      switch (env) {
+        case 'sandbox':
+          return 'https://api.sandbox.push.apple.com'
+
+        case 'production':
+          return 'https://api.sandbox.push.apple.com'
+
+        default:
+          throw new Error('Invalid env: ' + env)
+      }
+    })()
 
     /**
       * A map of the various network errors that can be encountered
@@ -77,7 +85,7 @@ module.exports = class ApplePush {
       session.on('socketError', sessionErrorHandler)
       session.on('goaway', sessionErrorHandler)
 
-      let headers = {
+      const headers = {
         ':path': `/3/device/${deviceToken}`,
         ':method': 'POST',
         'authorization': `bearer ${jwt}`,
