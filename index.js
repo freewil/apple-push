@@ -21,7 +21,7 @@ module.exports = class ApplePush {
           return 'https://api.sandbox.push.apple.com'
 
         case 'production':
-          return 'https://api.sandbox.push.apple.com'
+          return 'https://api.push.apple.com'
 
         default:
           throw new Error('Invalid env: ' + env)
