@@ -95,6 +95,7 @@ module.exports = class ApplePush {
         if (options.expiration) { headers['apns-expiration'] = options.expiration }
         if (options.priority) { headers['apns-priority'] = options.priority }
         if (options.collapseId) { headers['apns-collapse-id'] = options.collapseId }
+        if (options.pushType) { headers['apns-push-type'] = options.pushType }
       }
 
       const req = session.request(headers)
