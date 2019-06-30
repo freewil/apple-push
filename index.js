@@ -14,7 +14,7 @@ module.exports = class ApplePush {
    * @param {String} env - 'sandbox' or 'production'
    * @return {ApplePush} A new instance of type ApplePush
    */
-  constructor (env) {
+  constructor ({ env, bundleId }) {
     this.url = (() => {
       switch (env) {
         case 'sandbox':
@@ -27,6 +27,8 @@ module.exports = class ApplePush {
           throw new Error('Invalid env: ' + env)
       }
     })()
+
+    this.bundleId = bundleId
 
     /**
       * A map of the various network errors that can be encountered
@@ -57,22 +59,18 @@ module.exports = class ApplePush {
    * @return {Promise} A promise that resolves if the request is successful or rejects
    * with an error
    */
-  push (payload, jwt, deviceToken, bundleId, options) {
+  push (payload, jwt, deviceToken, options) {
     return new Promise((resolve, reject) => {
       if (!payload) {
-        reject(Error('Parameter `payload` is required'))
+        reject(new Error('Parameter `payload` is required'))
         return
       }
       if (!jwt) {
-        reject(Error('Parameter `jwt` is required'))
+        reject(new Error('Parameter `jwt` is required'))
         return
       }
       if (!deviceToken) {
-        reject(Error('Parameter `deviceToken` is required'))
-        return
-      }
-      if (!bundleId) {
-        reject(Error('Parameter `bundleId` is required'))
+        reject(new Error('Parameter `deviceToken` is required'))
         return
       }
       const session = http2.connect(this.url)
@@ -89,7 +87,7 @@ module.exports = class ApplePush {
         ':path': `/3/device/${deviceToken}`,
         ':method': 'POST',
         'authorization': `bearer ${jwt}`,
-        'apns-topic': bundleId
+        'apns-topic': this.bundleId
       }
 
       if (options) {
@@ -162,7 +160,7 @@ module.exports = class ApplePush {
         return
       }
 
-      let signingOptions = {
+      const signingOptions = {
         issuer: teamId,
         algorithm: 'ES256',
         header: {
@@ -173,12 +171,7 @@ module.exports = class ApplePush {
         if (err) {
           reject(err)
         } else {
-          try {
-            const result = token
-            resolve(result)
-          } catch (error) {
-            reject(error)
-          }
+          resolve(token)
         }
       })
     })
