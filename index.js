@@ -138,7 +138,7 @@ module.exports = class ApplePush {
    *
    * @param  {String} teamId - The teamId of the organization
    * @param  {String} keyId - The key id for the application
-   * @param  {String} key - The key to be used for signing
+   * @param  {String|Buffer} key - The key to be used for signing
    *
    * @return {Promise} A Promise that resolves with the JWT
    * or rejects if there was an error
@@ -155,7 +155,7 @@ module.exports = class ApplePush {
         return
       }
 
-      if (!key || key.trim() === '') {
+      if (!key) {
         reject(new Error('Parameter `key` is required'))
         return
       }
